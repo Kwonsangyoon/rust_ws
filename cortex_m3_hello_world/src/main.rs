@@ -20,22 +20,13 @@ fn main() -> ! {
 
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
 
-    //let mut gpioa = dp.GPIOA.split(&mut rcc.apb2);
     let mut gpioa = dp.GPIOA.split();
     let tx_pin = gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh);
     let rx_pin = gpioa.pa10;
 
     // afio의 MAPR를 사용하기 위한 초기화
-    //let mut afio = dp.AFIO.constrain(&mut rcc.apb2);
     let mut afio = dp.AFIO.constrain();
-    //let serial = Serial::usart1(
-    //    dp.USART1,
-    //    (tx_pin, rx_pin),
-    //    &mut afio.mapr,
-    //    Config::default().baudrate(115200.bps()),
-    //    clocks,
-    //    &mut rcc.apb2,
-    //);
+    
     
     let serial = Serial::usart1(
         dp.USART1,
