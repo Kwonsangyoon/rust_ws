@@ -1,0 +1,4 @@
+[package]
+name = "udp_server" # the name of the package
+version = "0.1.0"    # the current version, obeying semver
+authors = ["Kwon <ksu619@naver.com>"]
