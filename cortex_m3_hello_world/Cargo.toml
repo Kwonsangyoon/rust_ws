@@ -1,0 +1,9 @@
+[package]
+name = "cortex_m3_hello_world"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cortex-m = "0.7.3"  # cortex_m 크레이트를 추가합니다.
+cortex-m-rt = "0.7.3"
+stm32f1xx-hal = { version = "0.8.0", features = ["rt", "stm32f103"] }
