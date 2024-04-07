@@ -5,3 +5,6 @@ authors = ["Kwon <ksu619@naver.com>"]
 
 [dependencies]
 ndarray = "0.15.3"
+ndarray-linalg = { version = "0.14", features = ["openblas"] }  
+
+
