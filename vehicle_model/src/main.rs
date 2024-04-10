@@ -12,8 +12,8 @@ fn main() {
     let mut dot_position = Array2::from_shape_vec((6,1),vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
     let mut position = Array2::from_shape_vec((6,1),vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
     let external_force = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
-    let mut vehicle_position = Array2::from_shape_vec((6,1),vec![3.0, 0.0, 0.0, 0.0, 0.0, 3.141592]).unwrap();
-    let mut camera_position = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, 3.141592]).unwrap();
+    let mut vehicle_position = Array2::from_shape_vec((6,1),vec![3.0, 0.0, 0.0, 0.0, 0.0, (1.5708)]).unwrap();
+    let mut camera_position = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, 1.5708]).unwrap();
     
 
     loop
@@ -63,20 +63,21 @@ fn coordinate_transform(_parent_coordinate: &Array2<f32>, _child_coordinate: &Ar
     ]).unwrap(); // unwrap() 추가
 
     // rotation_matrix 함수의 결과를 직접 사용
-    let rotation_matrix_result = rotation_matrix(_parent_coordinate); // 가정: 이 함수가 Array2<f32> 반환
-
+    let trans_matrix_result = rotation_matrix(_parent_coordinate); // 가정: 이 함수가 Array2<f32> 반환
+    let rotation_matrix_result = rotation_matrix(_parent_coordinate).dot(&rotation_matrix(_child_coordinate));
     let trans_result = Array2::from_shape_vec((3, 1), vec![
         _parent_coordinate[(0, 0)], 
         _parent_coordinate[(1, 0)], 
         _parent_coordinate[(2, 0)]
-    ]).unwrap() + rotation_matrix_result.dot(&translation); // unwrap() 추가
+    ]).unwrap() + trans_matrix_result.dot(&translation); // unwrap() 추가
 
     let rot_result = Array2::from_shape_vec((3, 1), vec![
-        _parent_coordinate[(3, 0)], 
-        _parent_coordinate[(4, 0)], 
-        _parent_coordinate[(5, 0)]
-    ]).unwrap() + rotation_matrix_result.dot(&rotation); // unwrap() 추가
-
+        f32::atan2(rotation_matrix_result[(2, 1)],rotation_matrix_result[(2, 2)]),
+        f32::asin(-rotation_matrix_result[(2, 0)]),
+        f32::atan2(rotation_matrix_result[(0, 1)],rotation_matrix_result[(0, 0)])
+        
+    ]).unwrap(); // unwrap() 추가
+    //println!("{}\n",trans_result);
     result = concatenate(Axis(0), &[trans_result.view(), rot_result.view()]).unwrap();
     //result.extend(rot_result);
 
@@ -98,6 +99,7 @@ fn rotation_matrix(_vector: &Array2<f32>) -> Array2<f32>
             0.0f32, f32::sin(roll), f32::cos(roll)
             ]
     ).unwrap();
+    
     let rpitch = Array2::from_shape_vec((3,3),
         vec![ 
              f32::cos(pitch), 0.0f32, f32::sin(pitch),
@@ -105,6 +107,7 @@ fn rotation_matrix(_vector: &Array2<f32>) -> Array2<f32>
             -f32::sin(pitch), 0.0f32, f32::cos(pitch)
              ]
     ).unwrap();
+
     let ryaw = Array2::from_shape_vec((3,3),
         vec![
              f32::cos(yaw), -f32::sin(yaw), 0.0f32,
