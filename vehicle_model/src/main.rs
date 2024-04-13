@@ -12,8 +12,9 @@ fn main() {
     let mut dot_position = Array2::from_shape_vec((6,1),vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
     let mut position = Array2::from_shape_vec((6,1),vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
     let external_force = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, 0.0]).unwrap();
-    let mut vehicle_position = Array2::from_shape_vec((6,1),vec![3.0, 0.0, 0.0, 0.0, 0.0, (1.5708)]).unwrap();
-    let mut camera_position = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, 1.5708]).unwrap();
+    let mut vehicle_position = Array2::from_shape_vec((6,1),vec![3.0, 0.0, 0.0, 0.0, (1.5707), 0.0]).unwrap();
+    let mut camera_position = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, (1.5707)]).unwrap();
+    let mut camera_position2 = Array2::from_shape_vec((6,1),vec![1.0, 0.0, 0.0, 0.0, 0.0, (-1.5707)]).unwrap();
     
 
     loop
@@ -23,7 +24,9 @@ fn main() {
         ddot_position = dynamics_model(&dot_position,&position,&external_force);
         
         //coordinate_transform(&vehicle_position,&camera_position);
-        println!("{}\n",coordinate_transform(&vehicle_position,&camera_position));
+        println!("{}\n",coordinate_transform(&coordinate_transform(&vehicle_position,&camera_position),&camera_position2));
+        
+        
         //println!("{}\n",position);
         thread::sleep(Duration::from_millis(1));
     }
@@ -73,11 +76,11 @@ fn coordinate_transform(_parent_coordinate: &Array2<f32>, _child_coordinate: &Ar
 
     let rot_result = Array2::from_shape_vec((3, 1), vec![
         f32::atan2(rotation_matrix_result[(2, 1)],rotation_matrix_result[(2, 2)]),
-        f32::asin(-rotation_matrix_result[(2, 0)]),
-        f32::atan2(rotation_matrix_result[(0, 1)],rotation_matrix_result[(0, 0)])
+        -f32::asin(rotation_matrix_result[(2, 0)]),
+        f32::atan2(rotation_matrix_result[(1, 0)],rotation_matrix_result[(0, 0)])
         
     ]).unwrap(); // unwrap() 추가
-    //println!("{}\n",trans_result);
+    println!("{}\n",rotation_matrix_result);
     result = concatenate(Axis(0), &[trans_result.view(), rot_result.view()]).unwrap();
     //result.extend(rot_result);
 
@@ -110,8 +113,8 @@ fn rotation_matrix(_vector: &Array2<f32>) -> Array2<f32>
 
     let ryaw = Array2::from_shape_vec((3,3),
         vec![
-             f32::cos(yaw), -f32::sin(yaw), 0.0f32,
-             f32::sin(yaw),  f32::cos(yaw), 0.0f32,
+             f32::cos(yaw),   -f32::sin(yaw),   0.0f32,
+             f32::sin(yaw),    f32::cos(yaw),   0.0f32,
              0.0f32,           0.0f32,          1.0f32
             ]
     ).unwrap();
