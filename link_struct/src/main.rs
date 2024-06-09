@@ -40,7 +40,6 @@ fn main() {
         x : 1.0,
         child_node : None,
     };
-    
     head.append(0.3);
     
     head.list();
